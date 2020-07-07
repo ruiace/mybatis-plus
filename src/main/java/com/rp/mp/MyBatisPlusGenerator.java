@@ -24,6 +24,13 @@ import java.util.Scanner;
  * @since
  */
 public class MyBatisPlusGenerator {
+
+
+    /**
+     * 是否生产dto
+     */
+    private static final boolean IS_DTO = true;
+
     /**
      * <p>
      * 读取控制台内容
@@ -68,7 +75,7 @@ public class MyBatisPlusGenerator {
 
 		// 交易服务
 		dataSourceConfig
-				.setUrl("jdbc:mysql://101.200.133.224:3306/mp?serverTimezone=Asia/Shanghai&useSSL=false");
+				.setUrl("jdbc:mysql://101.200.133.224:3306/shanjupay_merchant_service?serverTimezone=Asia/Shanghai&useSSL=false");
 		// dataSourceConfig.setSchemaName("public");
 		dataSourceConfig.setDriverName("com.mysql.cj.jdbc.Driver");
 		dataSourceConfig.setUsername("root");
@@ -77,7 +84,7 @@ public class MyBatisPlusGenerator {
 
         // 生成包配置
         PackageConfig packageConfig = new PackageConfig();
-        packageConfig.setParent("com.rp");
+        packageConfig.setParent("com.shanjupay");
         //如果需要手动输入模块名
         packageConfig.setModuleName(scanner("模块名"));
         autoGenerator.setPackageInfo(packageConfig);
@@ -138,13 +145,19 @@ public class MyBatisPlusGenerator {
         strategyConfig.setControllerMappingHyphenStyle(true);
 
         //自动将数据库中表名为 user_info 格式的转为 UserInfo 命名
-        strategyConfig.setInclude(scanner("表名，多个英文逗号分割").split(","));
+        //全部生产 注释掉下面这一行
+        //strategyConfig.setInclude(scanner("表名，多个英文逗号分割").split(","));
         strategyConfig.setTablePrefix(packageConfig.getModuleName() + "_");//表名映射到实体名称去掉前缀
         strategyConfig.setEntityBooleanColumnRemoveIsPrefix(true);// Boolean类型字段是否移除is前缀处理
         autoGenerator.setStrategy(strategyConfig);
         autoGenerator.setTemplateEngine(new FreemarkerTemplateEngine());
         System.out.println("===================== MyBatis Plus Generator ==================");
 
+        if(IS_DTO){
+            globalConfig.setSwagger2(true);
+            globalConfig.setEntityName("%sDTO");
+            packageConfig.setEntity("dto");
+        }
         autoGenerator.execute();
 
         System.out.println("================= MyBatis Plus Generator Execute Complete ==================");
